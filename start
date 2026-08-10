@@ -1,14 +1,15 @@
 #!/bin/sh
 set -e
 
-# 1. Установка зависимостей Composer
 echo "📦 Installing Composer dependencies..."
-docker exec -t rp_php composer install --no-interaction --no-dev --optimize-autoloader
+docker exec -t rp_php composer install --no-interaction --optimize-autoloader
 
-# 2. Миграция базы данных и сидирование
 echo "🗄️ Running migrations and seeding..."
 docker exec -t rp_php php artisan migrate --force --seed
 
-# 3. Установка прав доступа (ВНИМАНИЕ: см. предупреждение ниже)
 echo "🔒 Setting permissions..."
 docker exec -t rp_php chmod -R 777 database
+docker exec -t rp_php chmod -R 777 storage
+docker exec -t rp_php chmod -R 777 bootstrap/cache
+
+echo "Finished"
