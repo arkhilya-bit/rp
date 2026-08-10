@@ -38,10 +38,7 @@
                         </th>
                         
                         <th class="cursor-pointer">
-                            <a href="{{ request()->fullUrlWithQuery(['sort' => 'score', 'direction' => $sortBy === 'score' && $direction === 'asc' ? 'desc' : 'asc']) }}">
                                 Ранг
-                                @if($sortBy === 'score') <span class="sort-icon">{{ $direction === 'asc' ? '▲' : '▼' }}</span> @endif
-                            </a>
                         </th>
                         
                         <th class="cursor-pointer">

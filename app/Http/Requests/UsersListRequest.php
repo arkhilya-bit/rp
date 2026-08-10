@@ -17,7 +17,7 @@ class UsersListRequest extends FormRequest
         return [
             'sort' => [
                 'sometimes',
-                'in:id,name,city,age,score,email',
+                'in:id,name,city,age,email',
                 ],
 
             'direction' => ['sometimes',

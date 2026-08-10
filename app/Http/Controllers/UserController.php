@@ -5,15 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\UsersListRequest;
 use App\Models\User;
+use App\Service\Ranking;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
-    public function index(UsersListRequest $request): View
+    public function index(UsersListRequest $request, Ranking $rank): View
     {
         $sortBy = $request->validated('sort') ?? 'id';
         $direction = $request->validated('direction') ?? 'asc';
@@ -21,17 +20,12 @@ class UserController extends Controller
         $cacheKey = "users_list:{$page}-{$sortBy}-{$direction}";
         $newDirection = $direction === 'asc' ? 'desc' : "asc";
 
-        $users = Cache::remember($cacheKey, now()->addMinutes(10),
-            fn() => User::orderBy($sortBy, $direction)->paginate(10));
+        $users = User::orderBy($sortBy, $direction)->paginate(10);
+        $users->each(function($user) use ($rank) {
+            $user->setAttribute('score', $rank->getUserScore($user->id));
+        });
         
         return view('users.index', compact('users', 'sortBy', 'direction', 'newDirection'));
-    }
-
-    public function showTopUsers(Request $request): View
-    {
-        $users = Cache::remember('top_users', now()->addMinutes(10), fn() => User::getTopUsers());
-        
-        return view('users.top', compact('users'));
     }
 
     public function login(LoginRequest $request): RedirectResponse
@@ -39,7 +33,8 @@ class UserController extends Controller
         $credentials = $request->validated();
         $auth = Auth::attempt($credentials, true);
 
-        return $auth ? redirect()->intended('/push')
+        return $auth
+            ? redirect()->intended('/push')
             : redirect()->back()->withErrors(['email' => 'Неверный емейл или пароль']);
     }
 }
