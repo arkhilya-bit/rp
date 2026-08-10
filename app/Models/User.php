@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Service\Ranking;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -34,8 +35,6 @@ class User extends Authenticatable
 
     public static function getTopUsers(): Collection
     {
-        return User::orderByDesc('score')
-                       ->limit(5)
-                       ->get();
+        return new Ranking()->getTopUsers();
     }
 }
