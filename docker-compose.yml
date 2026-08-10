@@ -30,10 +30,11 @@ services:
   #   container_name: php-schedule-worker
   #   command: php artisan schedule:work
 
-  # queue:
-  #   <<: *php-common
-  #   container_name: php-queue-worker
-  #   command: php artisan queue:work
+  rp_queue:
+    extends: rp_php
+    container_name: rp_queue
+    command: php artisan queue:work --tries=3
+    restart: always
 
   # pgsql:
   #   image: postgres:14.20-alpine3.23
